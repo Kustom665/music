@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wavelength — Honest Music Reviews</title>
+<meta name="description" content="Wavelength: sharp, honest reviews of new albums, EPs, and singles across every genre.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+<div class="noise"></div>
+
+<header class="site-header">
+  <div class="container header-inner">
+    <a href="#" class="logo">Wave<span>length</span></a>
+    <nav class="main-nav">
+      <a href="#reviews">Reviews</a>
+      <a href="#genres">Genres</a>
+      <a href="#about">About</a>
+      <a href="#newsletter" class="nav-cta">Subscribe</a>
+    </nav>
+    <button class="nav-toggle" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container hero-inner">
+      <p class="eyebrow">No hype. No PR fluff. Just the record.</p>
+      <h1>We listen twice.<br>Then we tell you the truth.</h1>
+      <p class="hero-sub">Wavelength reviews new albums, EPs, and singles the day they drop — scored, dissected, and ranked without a publicist in the room.</p>
+      <div class="hero-actions">
+        <a href="#reviews" class="btn btn-primary">Read the latest reviews</a>
+        <a href="#newsletter" class="btn btn-ghost">Get reviews by email</a>
+      </div>
+      <div class="hero-stats">
+        <div><strong>1,240+</strong><span>Albums reviewed</span></div>
+        <div><strong>38</strong><span>Genres covered</span></div>
+        <div><strong>92k</strong><span>Weekly readers</span></div>
+      </div>
+    </div>
+    <div class="hero-visual" aria-hidden="true">
+      <div class="vinyl"></div>
+    </div>
+  </section>
+
+  <!-- FEATURED REVIEW -->
+  <section class="featured">
+    <div class="container featured-inner">
+      <div class="featured-art art-1"></div>
+      <div class="featured-copy">
+        <span class="tag">Editor's Pick</span>
+        <h2>Midnight Static — <em>Lower Frequencies</em></h2>
+        <div class="score score-lg">9.1</div>
+        <p>A record that sounds like it was mixed at 3am and meant to be heard that way. "Lower Frequencies" trades the band's earlier pop instincts for something murkier, slower, and far more interesting — proof that restraint can hit harder than a chorus.</p>
+        <a href="#" class="read-link">Read the full review →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- REVIEWS GRID -->
+  <section id="reviews" class="reviews">
+    <div class="container">
+      <div class="section-head">
+        <h2>Latest reviews</h2>
+        <div class="filters">
+          <button class="filter active" data-filter="all">All</button>
+          <button class="filter" data-filter="indie">Indie</button>
+          <button class="filter" data-filter="electronic">Electronic</button>
+          <button class="filter" data-filter="hiphop">Hip-Hop</button>
+          <button class="filter" data-filter="rock">Rock</button>
+        </div>
+      </div>
+
+      <div class="review-grid">
+
+        <article class="review-card" data-genre="electronic">
+          <div class="card-art art-2"></div>
+          <div class="card-body">
+            <div class="card-top">
+              <span class="genre-pill">Electronic</span>
+              <span class="score">8.4</span>
+            </div>
+            <h3>Nova Reyes — <em>Glass Horizon</em></h3>
+            <p>Icy synths, patient builds, and a closing track that finally lets the sun in.</p>
+            <span class="byline">Reviewed by Dana Okafor · 4 min read</span>
+          </div>
+        </article>
+
+        <article class="review-card" data-genre="hiphop">
+          <div class="card-art art-3"></div>
+          <div class="card-body">
+            <div class="card-top">
+              <span class="genre-pill">Hip-Hop</span>
+              <span class="score">7.6</span>
+            </div>
+            <h3>Kilo Grand — <em>Concrete Bloom</em></h3>
+            <p>Uneven pacing can't sink sharp writing and two of the year's best verses.</p>
+            <span class="byline">Reviewed by Marcus Reid · 5 min read</span>
+          </div>
+        </article>
+
+        <article class="review-card" data-genre="indie">
+          <div class="card-art art-4"></div>
+          <div class="card-body">
+            <div class="card-top">
+              <span class="genre-pill">Indie</span>
+              <span class="score">8.9</span>
+            </div>
+            <h3>Paper Wren — <em>Small Weather</em></h3>
+            <p>Quiet, precise, devastating in places it has no business being.</p>
+            <span class="byline">Reviewed by Dana Okafor · 3 min read</span>
+          </div>
+        </article>
+
+        <article class="review-card" data-genre="rock">
+          <div class="card-art art-5"></div>
+          <div class="card-body">
+            <div class="card-top">
+              <span class="genre-pill">Rock</span>
+              <span class="score">6.8</span>
+            </div>
+            <h3>Redline Choir — <em>Static Vows</em></h3>
+            <p>Big riffs, bigger ambitions, but the back half runs out of new ideas.</p>
+            <span class="byline">Reviewed by Priya Nathan · 4 min read</span>
+          </div>
+        </article>
+
+        <article class="review-card" data-genre="electronic">
+          <div class="card-art art-6"></div>
+          <div class="card-body">
+            <div class="card-top">
+              <span class="genre-pill">Electronic</span>
+              <span class="score">9.3</span>
+            </div>
+            <h3>Ovid Lane — <em>Corridor</em></h3>
+            <p>A club record that never forgets it also has to work in headphones.</p>
+            <span class="byline">Reviewed by Marcus Reid · 6 min read</span>
+          </div>
+        </article>
+
+        <article class="review-card" data-genre="indie">
+          <div class="card-art art-7"></div>
+          <div class="card-body">
+            <div class="card-top">
+              <span class="genre-pill">Indie</span>
+              <span class="score">7.2</span>
+            </div>
+            <h3>Coastline Radio — <em>Salt EP</em></h3>
+            <p>Four songs, one clear idea, and a hook on track two worth the whole listen.</p>
+            <span class="byline">Reviewed by Priya Nathan · 2 min read</span>
+          </div>
+        </article>
+
+      </div>
+
+      <div class="load-more-wrap">
+        <button class="btn btn-outline">Load more reviews</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- GENRES -->
+  <section id="genres" class="genres">
+    <div class="container">
+      <h2>Browse by genre</h2>
+      <div class="genre-grid">
+        <a href="#" class="genre-card">Indie</a>
+        <a href="#" class="genre-card">Electronic</a>
+        <a href="#" class="genre-card">Hip-Hop</a>
+        <a href="#" class="genre-card">Rock</a>
+        <a href="#" class="genre-card">Pop</a>
+        <a href="#" class="genre-card">R&amp;B</a>
+        <a href="#" class="genre-card">Jazz</a>
+        <a href="#" class="genre-card">Metal</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT / CREDIBILITY -->
+  <section id="about" class="about">
+    <div class="container about-inner">
+      <div>
+        <h2>Reviewed by people who actually listen</h2>
+        <p>Wavelength is written by a small team of critics and musicians, not algorithms. Every score reflects at least three full listens — no press-release paraphrasing, no advertiser influence on ratings.</p>
+        <ul class="about-points">
+          <li>Independent — no label or streaming partnerships affect scores</li>
+          <li>Every review published with the reviewer's name attached</li>
+          <li>Scores explained, never just handed down</li>
+        </ul>
+      </div>
+      <div class="about-grid">
+        <div class="stat-box"><strong>7</strong><span>Staff critics</span></div>
+        <div class="stat-box"><strong>2019</strong><span>Founded</span></div>
+        <div class="stat-box"><strong>0</strong><span>Sponsored scores</span></div>
+        <div class="stat-box"><strong>4.8/5</strong><span>Reader trust rating</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NEWSLETTER -->
+  <section id="newsletter" class="newsletter">
+    <div class="container newsletter-inner">
+      <h2>Never miss a review</h2>
+      <p>One email a week. New scores, one deep-dive, zero spam.</p>
+      <form class="newsletter-form" id="newsletter-form">
+        <input type="email" placeholder="you@example.com" required aria-label="Email address">
+        <button type="submit" class="btn btn-primary">Subscribe</button>
+      </form>
+      <p class="form-note" id="form-note"></p>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="container footer-inner">
+    <a href="#" class="logo">Wave<span>length</span></a>
+    <nav class="footer-nav">
+      <a href="#reviews">Reviews</a>
+      <a href="#genres">Genres</a>
+      <a href="#about">About</a>
+      <a href="#newsletter">Subscribe</a>
+    </nav>
+    <p class="footer-copy">© 2026 Wavelength. All reviews independently written.</p>
+  </div>
+</footer>
+
+<script src="js/script.js"></script>
+</body>
+</html>
