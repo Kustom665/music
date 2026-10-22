@@ -4,7 +4,7 @@
   "description": "Wavelength landing page and the Foresight forecasting kit",
   "scripts": {
     "test": "node --test foresight/test.js",
-    "build": "node foresight/build.js",
+    "bundle": "node foresight/build.js",
     "foresight": "node foresight/cli.js"
   },
   "engines": { "node": ">=18" }

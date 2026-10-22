@@ -21,7 +21,7 @@ Forecasting instruments: trend projection with backtest, Monte Carlo, Bayesian u
 
 ```
 npm test
-npm run build
+npm run bundle
 node foresight/cli.js trend "120,128,131,145,152,149,166,171" --h 6 --target 220
 node foresight/cli.js sim --formula "units*price" --var "units=100,150,300" --var "price=9,12,15" --seed 1
 node foresight/cli.js help
