@@ -1,0 +1,535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Foresight Kit</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* Layout: one instrument per tab. Inputs in a narrow left card, live readout on the right; stacks on phones. */
+:root {
+  --bg: #eef1ef;
+  --panel: #f8faf8;
+  --fg: #142022;
+  --dim: #56686a;
+  --line: #cfd8d5;
+  --accent: #0d7a72;
+  --accent-soft: rgba(13,122,114,.16);
+  --amber: #a85f00;
+  --good: #2a7d3b;
+  --bad: #b3362b;
+  --font-d: 'Archivo', 'Arial Narrow', Arial, sans-serif;
+  --font-b: 'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-m: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0c1214; --panel: #131c1f; --fg: #e4eceb; --dim: #8da3a4; --line: #24343a;
+    --accent: #4cc9bd; --accent-soft: rgba(76,201,189,.18); --amber: #e5a23a; --good: #59c274; --bad: #ef6b5f;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0c1214; --panel: #131c1f; --fg: #e4eceb; --dim: #8da3a4; --line: #24343a;
+  --accent: #4cc9bd; --accent-soft: rgba(76,201,189,.18); --amber: #e5a23a; --good: #59c274; --bad: #ef6b5f;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg);
+  font: 15px/1.5 var(--font-b);
+  margin: 0;
+  padding-block: 24px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.wrap { max-width: 1040px; margin: 0 auto; }
+h1 { font: 800 clamp(30px, 5.5vw, 46px)/1.02 var(--font-d); letter-spacing: -.02em; margin: 0 0 8px; text-wrap: balance; }
+h2 { font: 700 18px var(--font-d); margin: 0 0 4px; }
+.lede { color: var(--dim); max-width: 62ch; margin: 0; }
+.tabs { display: flex; gap: 4px; overflow-x: auto; border-bottom: 1px solid var(--line); margin: 22px 0 20px; }
+.tab { font: 500 13px var(--font-m); padding: 10px 14px; background: none; border: 0; border-bottom: 2px solid transparent; color: var(--dim); cursor: pointer; white-space: nowrap; }
+.tab:hover { color: var(--fg); }
+.tab[aria-selected="true"] { color: var(--fg); border-bottom-color: var(--accent); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.panel[hidden] { display: none; }
+.split { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 22px; align-items: start; }
+@media (max-width: 820px) { .split { grid-template-columns: minmax(0, 1fr); } }
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 16px; min-width: 0; }
+.stack { display: grid; gap: 14px; min-width: 0; }
+label { display: block; font: 500 11px var(--font-m); color: var(--dim); margin: 12px 0 4px; text-transform: uppercase; letter-spacing: .07em; }
+label:first-of-type { margin-top: 8px; }
+input, select, textarea {
+  width: 100%; background: var(--bg); color: var(--fg); border: 1px solid var(--line);
+  border-radius: 6px; padding: 8px 10px; font: 14px var(--font-m); min-width: 0;
+}
+textarea { min-height: 130px; resize: vertical; }
+.btn { background: var(--accent); color: var(--bg); border: 0; border-radius: 6px; padding: 9px 14px; font: 600 13px var(--font-b); cursor: pointer; }
+.btn.ghost { background: transparent; color: var(--fg); border: 1px solid var(--line); }
+.btn.small { padding: 5px 9px; font-size: 12px; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; align-items: end; }
+.row > * { flex: 1 1 90px; min-width: 0; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.stat { border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px; background: var(--panel); min-width: 0; }
+.stat b { display: block; font: 800 22px/1.15 var(--font-d); font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.stat span { font: 12px var(--font-m); color: var(--dim); }
+.note { font-size: 13px; color: var(--dim); margin: 8px 0 0; }
+.warn { color: var(--amber); }
+.good { color: var(--good); } .bad { color: var(--bad); }
+.scroll { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font: 13px var(--font-m); font-variant-numeric: tabular-nums; }
+th, td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+th { color: var(--dim); font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; }
+svg.chart { width: 100%; height: auto; display: block; }
+.gl { stroke: var(--line); stroke-width: 1; }
+.ax { font: 11px var(--font-m); fill: var(--dim); }
+.hist { stroke: var(--dim); stroke-width: 2; fill: none; }
+.fc { stroke: var(--accent); stroke-width: 2.5; fill: none; stroke-dasharray: 6 4; }
+.band { fill: var(--accent-soft); }
+.dot { fill: var(--accent); }
+.bar { fill: var(--accent); }
+.amber { stroke: var(--amber); stroke-width: 2; }
+.mk { stroke: var(--fg); stroke-width: 1.5; stroke-dasharray: 3 3; }
+.tag { font: 11px var(--font-m); fill: var(--fg); }
+.meter { height: 8px; background: var(--line); border-radius: 4px; overflow: hidden; min-width: 80px; }
+.meter i { display: block; height: 100%; background: var(--accent); }
+.meter i.neg { background: var(--amber); }
+.var-row { display: grid; grid-template-columns: minmax(0, 1.3fr) repeat(3, minmax(0, 1fr)) auto; gap: 6px; margin-bottom: 6px; align-items: center; }
+.ev-row { display: grid; grid-template-columns: minmax(0, 1.6fr) repeat(2, minmax(0, 1fr)) minmax(0, 1fr) auto; gap: 6px; margin-bottom: 6px; align-items: center; }
+.opt { border: 1px solid var(--line); border-radius: 8px; padding: 10px; margin-bottom: 10px; }
+.pred { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.pred small { font: 12px var(--font-m); color: var(--dim); display: block; }
+.pred .acts { display: flex; gap: 6px; flex-wrap: wrap; align-items: start; }
+footer { margin-top: 34px; color: var(--dim); font-size: 13px; max-width: 70ch; }
+@media (prefers-reduced-motion: no-preference) { .meter i { transition: width .25s ease; } }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <h1>Foresight Kit</h1>
+    <p class="lede">Six small instruments for reasoning about what happens next: extend a trend, simulate a range, update on evidence, compare bets, project growth, and score your own forecasts. Everything runs in this page.</p>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Instruments">
+    <button class="tab" role="tab" data-tab="trend" id="t-trend">Trend</button>
+    <button class="tab" role="tab" data-tab="simulate" id="t-simulate">Monte Carlo</button>
+    <button class="tab" role="tab" data-tab="bayes" id="t-bayes">Bayes</button>
+    <button class="tab" role="tab" data-tab="decide" id="t-decide">Decision</button>
+    <button class="tab" role="tab" data-tab="growth" id="t-growth">Growth</button>
+    <button class="tab" role="tab" data-tab="ledger" id="t-ledger">Ledger</button>
+  </div>
+
+  <section class="panel" id="p-trend" role="tabpanel" aria-labelledby="t-trend">
+    <div class="split">
+      <div class="card">
+        <h2>Trend forecast</h2>
+        <p class="note">Extends a series and shows how fast the uncertainty widens. Auto mode backtests each method on the last quarter of your data and uses the winner.</p>
+        <label for="tr-data">Your numbers, oldest first</label>
+        <textarea id="tr-data">120, 128, 131, 145, 152, 149, 166, 171, 183, 190, 188, 205, 214, 226, 231, 247</textarea>
+        <div class="row">
+          <div><label for="tr-h">Steps ahead</label><input id="tr-h" type="number" min="1" max="120" value="8"></div>
+          <div><label for="tr-ci">Range</label><select id="tr-ci"><option value="0.6745">50%</option><option value="1.2816" selected>80%</option><option value="1.96">95%</option></select></div>
+        </div>
+        <label for="tr-m">Method</label>
+        <select id="tr-m"><option value="auto" selected>Auto (best on backtest)</option><option value="linear">Linear</option><option value="exp">Exponential</option><option value="holt">Damped trend</option></select>
+        <label for="tr-t">Target value (optional)</label>
+        <input id="tr-t" type="number" step="any" value="300">
+        <p class="note">One number per line or comma separated. At least 4 values.</p>
+      </div>
+      <div class="stack" id="tr-out"></div>
+    </div>
+  </section>
+
+  <section class="panel" id="p-simulate" role="tabpanel" aria-labelledby="t-simulate" hidden>
+    <div class="split">
+      <div class="card">
+        <h2>Monte Carlo</h2>
+        <p class="note">Give each unknown a low, likely and high value. The formula is run thousands of times with values drawn from those ranges.</p>
+        <label>Inputs (name, low, likely, high)</label>
+        <div id="mc-vars"></div>
+        <button class="btn ghost small" id="mc-add" type="button">Add input</button>
+        <label for="mc-f">Formula</label>
+        <input id="mc-f" value="customers * price * 12 * (1 - churn)" spellcheck="false">
+        <p class="note">Use your input names. min, max, sqrt, pow, log, exp, abs are available.</p>
+        <div class="row">
+          <div><label for="mc-n">Trials</label><select id="mc-n"><option value="5000">5,000</option><option value="20000" selected>20,000</option><option value="100000">100,000</option></select></div>
+          <div><label for="mc-th">Threshold</label><input id="mc-th" type="number" step="any" value="400000"></div>
+        </div>
+        <p style="margin:14px 0 0"><button class="btn" id="mc-run" type="button">Run simulation</button></p>
+      </div>
+      <div class="stack" id="mc-out"></div>
+    </div>
+  </section>
+
+  <section class="panel" id="p-bayes" role="tabpanel" aria-labelledby="t-bayes" hidden>
+    <div class="split">
+      <div class="card">
+        <h2>Bayesian updater</h2>
+        <p class="note">Start from a base rate, then fold in each piece of evidence. For each item give how often you would see it if the claim is true and if it is false.</p>
+        <label for="by-prior">Prior probability (%)</label>
+        <input id="by-prior" type="number" step="any" min="0" max="100" value="5">
+        <label>Evidence</label>
+        <div id="by-rows"></div>
+        <button class="btn ghost small" id="by-add" type="button">Add evidence</button>
+        <p class="note">Rows marked "not seen" use the chance of the evidence being absent.</p>
+      </div>
+      <div class="stack" id="by-out"></div>
+    </div>
+  </section>
+
+  <section class="panel" id="p-decide" role="tabpanel" aria-labelledby="t-decide" hidden>
+    <div class="split">
+      <div class="card">
+        <h2>Decision calculator</h2>
+        <p class="note">One line per outcome: chance in percent, then payoff. Chances are rescaled if they do not add to 100.</p>
+        <div id="dc-opts"></div>
+        <button class="btn ghost small" id="dc-add" type="button">Add option</button>
+        <label for="dc-risk">Risk aversion: <span id="dc-risk-v">0.5</span></label>
+        <input id="dc-risk" type="range" min="0" max="2" step="0.1" value="0.5">
+        <p class="note">Score = expected payoff minus risk aversion times the spread of outcomes.</p>
+      </div>
+      <div class="stack" id="dc-out"></div>
+    </div>
+  </section>
+
+  <section class="panel" id="p-growth" role="tabpanel" aria-labelledby="t-growth" hidden>
+    <div class="split">
+      <div class="card">
+        <h2>Growth projector</h2>
+        <p class="note">Compounding with optional contributions each period, plus a solver for the rate between two known values.</p>
+        <div class="row">
+          <div><label for="gr-s">Start value</label><input id="gr-s" type="number" step="any" value="1000"></div>
+          <div><label for="gr-r">Rate per period (%)</label><input id="gr-r" type="number" step="any" value="7"></div>
+        </div>
+        <div class="row">
+          <div><label for="gr-p">Periods</label><input id="gr-p" type="number" min="1" max="500" value="30"></div>
+          <div><label for="gr-a">Added each period</label><input id="gr-a" type="number" step="any" value="100"></div>
+        </div>
+        <label for="gr-t">Target (optional)</label>
+        <input id="gr-t" type="number" step="any" value="10000">
+        <label for="gr-log">Chart scale</label>
+        <select id="gr-log"><option value="lin">Linear</option><option value="log">Log</option></select>
+        <h2 style="margin-top:20px">Solve for the rate</h2>
+        <div class="row">
+          <div><label for="cg-b">Began at</label><input id="cg-b" type="number" step="any" value="250"></div>
+          <div><label for="cg-e">Ended at</label><input id="cg-e" type="number" step="any" value="900"></div>
+          <div><label for="cg-n">Periods</label><input id="cg-n" type="number" step="any" value="5"></div>
+        </div>
+        <p class="note" id="cg-out"></p>
+      </div>
+      <div class="stack" id="gr-out"></div>
+    </div>
+  </section>
+
+  <section class="panel" id="p-ledger" role="tabpanel" aria-labelledby="t-ledger" hidden>
+    <div class="split">
+      <div class="card">
+        <h2>Prediction ledger</h2>
+        <p class="note">Write a claim, give it a probability, and mark it yes or no when you know. The Brier score and calibration chart show whether your 70% really means 70%.</p>
+        <label for="lg-t">Claim</label>
+        <input id="lg-t" placeholder="The proposal is approved before March">
+        <div class="row">
+          <div><label for="lg-p">Probability (%)</label><input id="lg-p" type="number" min="1" max="99" step="1" value="70"></div>
+          <div><label for="lg-d">Known by</label><input id="lg-d" type="date"></div>
+        </div>
+        <p style="margin:14px 0 0"><button class="btn" id="lg-add" type="button">Log prediction</button></p>
+        <details style="margin-top:16px">
+          <summary class="note" style="cursor:pointer">Backup and restore</summary>
+          <p class="note">Entries live in this browser only. Copy the backup text somewhere safe, or paste one here to restore.</p>
+          <p style="margin:8px 0"><button class="btn ghost small" id="lg-copy" type="button">Copy backup</button> <span class="note" id="lg-copy-msg"></span></p>
+          <label for="lg-restore">Paste backup</label>
+          <textarea id="lg-restore" style="min-height:70px"></textarea>
+          <p style="margin:8px 0 0"><button class="btn ghost small" id="lg-load" type="button">Restore</button> <span class="note" id="lg-load-msg"></span></p>
+        </details>
+      </div>
+      <div class="stack" id="lg-out"></div>
+    </div>
+  </section>
+
+  <footer>These tools extend the numbers and beliefs you give them. They do not know the future, and a tight range only means the inputs were tight. Log your forecasts in the Ledger to find out how good yours are.</footer>
+</div>
+
+<script src="engine.js"></script>
+<script>
+const F = Foresight;
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+const on = (sel, evs, fn) => $$(sel).forEach(el => evs.split(' ').forEach(e => el.addEventListener(e, fn)));
+function fmt(x) {
+  if (!isFinite(x)) return '–';
+  const a = Math.abs(x);
+  if (a >= 1e9) return +(x / 1e9).toPrecision(3) + 'B';
+  if (a >= 1e6) return +(x / 1e6).toPrecision(3) + 'M';
+  if (a >= 1e4) return +(x / 1e3).toPrecision(3) + 'k';
+  if (a >= 100) return String(+x.toFixed(1));
+  return String(+x.toPrecision(3));
+}
+const pct = (x, d = 1) => (x * 100).toFixed(d) + '%';
+function ticks(lo, hi, n = 5) {
+  const span = hi - lo || 1, step0 = span / n, mag = Math.pow(10, Math.floor(Math.log10(step0))), norm = step0 / mag;
+  const step = (norm < 1.5 ? 1 : norm < 3 ? 2 : norm < 7 ? 5 : 10) * mag, out = [];
+  for (let v = Math.ceil(lo / step) * step; v <= hi + step * 1e-9; v += step) out.push(+v.toFixed(10));
+  return out;
+}
+const nums = F.parseNumbers;
+
+/* ---------- tabs ---------- */
+const TABS = ['trend', 'simulate', 'bayes', 'decide', 'growth', 'ledger'];
+function showTab(id) {
+  TABS.forEach(t => {
+    $('#p-' + t).hidden = t !== id;
+    $('#t-' + t).setAttribute('aria-selected', t === id ? 'true' : 'false');
+  });
+}
+$$('.tab').forEach(b => b.addEventListener('click', () => showTab(b.dataset.tab)));
+showTab(TABS.includes(location.hash.slice(1)) ? location.hash.slice(1) : 'trend');
+
+/* ---------- generic line chart ---------- */
+function lineChart(pts, { log = false, xlabel = 'period' } = {}) {
+  const W = 720, H = 300, m = { l: 56, r: 16, t: 12, b: 30 };
+  const f = v => log ? Math.log10(v) : v;
+  const ys = pts.map(p => f(p.y));
+  let lo = Math.min(...ys), hi = Math.max(...ys); if (lo === hi) { lo -= 1; hi += 1; }
+  const pad = (hi - lo) * .06; lo -= pad; hi += pad;
+  const X = i => m.l + i / (pts.length - 1 || 1) * (W - m.l - m.r);
+  const Y = v => m.t + (1 - (f(v) - lo) / (hi - lo)) * (H - m.t - m.b);
+  const yt = log ? ticks(lo, hi, 5).map(t => Math.pow(10, t)) : ticks(lo, hi, 5);
+  let s = `<svg class="chart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Projected value by ${xlabel}">`;
+  yt.forEach(t => { if (f(t) >= lo && f(t) <= hi) s += `<line class="gl" x1="${m.l}" x2="${W - m.r}" y1="${Y(t)}" y2="${Y(t)}"/><text class="ax" x="${m.l - 6}" y="${Y(t) + 4}" text-anchor="end">${fmt(t)}</text>`; });
+  ticks(0, pts.length - 1, 6).forEach(t => { s += `<text class="ax" x="${X(t)}" y="${H - 8}" text-anchor="middle">${Math.round(t)}</text>`; });
+  s += `<path class="fc" style="stroke-dasharray:none" d="${pts.map((p, i) => (i ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Y(p.y).toFixed(1)).join('')}"/>`;
+  s += `<circle class="dot" r="4" cx="${X(pts.length - 1)}" cy="${Y(pts[pts.length - 1].y)}"/></svg>`;
+  return s;
+}
+
+/* ---------- 1. TREND ---------- */
+function renderTrend() {
+  const out = $('#tr-out'), y = nums($('#tr-data').value);
+  const H = Math.max(1, Math.min(120, Math.round(+$('#tr-h').value) || 8)), z = +$('#tr-ci').value;
+  if (y.length < 4) { out.innerHTML = '<div class="card"><p class="warn">Enter at least 4 numbers to forecast.</p></div>'; return; }
+  const n = y.length, fc = F.forecast(y, { h: H, z, method: $('#tr-m').value }), r = fc, pick = fc.used, back = fc.backtest, note = fc.note;
+  const W = 720, Ht = 300, m = { l: 56, r: 16, t: 12, b: 30 }, T = n - 1 + H;
+  const all = [...y, ...r.lo, ...r.hi];
+  let lo = Math.min(...all), hi = Math.max(...all); const pad = (hi - lo) * .06 || 1; lo -= pad; hi += pad;
+  const X = i => m.l + i / T * (W - m.l - m.r), Y = v => m.t + (1 - (v - lo) / (hi - lo)) * (Ht - m.t - m.b);
+  let s = `<svg class="chart" viewBox="0 0 ${W} ${Ht}" role="img" aria-label="History and forecast with uncertainty band">`;
+  ticks(lo, hi, 5).forEach(t => { s += `<line class="gl" x1="${m.l}" x2="${W - m.r}" y1="${Y(t)}" y2="${Y(t)}"/><text class="ax" x="${m.l - 6}" y="${Y(t) + 4}" text-anchor="end">${fmt(t)}</text>`; });
+  ticks(0, T, 6).forEach(t => { s += `<text class="ax" x="${X(t)}" y="${Ht - 8}" text-anchor="middle">${Math.round(t) + 1}</text>`; });
+  const up = r.hi.map((v, h) => `${X(n + h)},${Y(v)}`), dn = r.lo.map((v, h) => `${X(n + h)},${Y(v)}`).reverse();
+  s += `<polygon class="band" points="${X(n - 1)},${Y(y[n - 1])} ${up.join(' ')} ${dn.join(' ')}"/>`;
+  s += `<path class="hist" d="${y.map((v, i) => (i ? 'L' : 'M') + X(i).toFixed(1) + ' ' + Y(v).toFixed(1)).join('')}"/>`;
+  s += `<path class="fc" d="M${X(n - 1).toFixed(1)} ${Y(y[n - 1]).toFixed(1)}${r.mean.map((v, h) => 'L' + X(n + h).toFixed(1) + ' ' + Y(v).toFixed(1)).join('')}"/>`;
+  const tv = $('#tr-t').value === '' ? null : +$('#tr-t').value;
+  if (tv !== null && isFinite(tv) && tv >= lo && tv <= hi) s += `<line class="amber" x1="${m.l}" x2="${W - m.r}" y1="${Y(tv)}" y2="${Y(tv)}" stroke-dasharray="2 4"/><text class="tag" x="${W - m.r - 4}" y="${Y(tv) - 5}" text-anchor="end">target ${fmt(tv)}</text>`;
+  s += `<circle class="dot" cx="${X(T)}" cy="${Y(r.mean[H - 1])}" r="4"/></svg>`;
+  const last = y[n - 1], end = r.mean[H - 1], per = (end - last) / H;
+  let cross = '';
+  if (tv !== null && isFinite(tv)) {
+    const cx = F.crossing(y, r, tv), mid = cx.central, early = cx.earliest, late = cx.latest;
+    cross = mid
+      ? `<p class="note">Central path reaches ${fmt(tv)} at step ${mid}. Range: step ${early ?? '–'} (earliest) to ${late ? 'step ' + late : 'beyond the horizon'} (latest).</p>`
+      : `<p class="note warn">The central path does not reach ${fmt(tv)} within ${H} steps${early ? `; the optimistic edge gets there at step ${early}` : ''}.</p>`;
+  }
+  let tbl = '';
+  if (back) {
+    const bestKey = Object.keys(back).sort((a, b) => back[a] - back[b])[0];
+    tbl = `<div class="card"><h2>Backtest</h2><p class="note">Each method saw the first ${n - Math.max(2, Math.floor(n * .25))} points and predicted the rest. Lower average miss is better.</p><div class="scroll"><table><tr><th>Method</th><th>Average miss</th><th></th></tr>${Object.keys(back).map(k => `<tr><td>${F.METHODS[k].name}</td><td>${fmt(back[k])}</td><td>${k === bestKey ? '<span class="good">best</span>' : ''}${k === pick ? ' · in use' : ''}</td></tr>`).join('')}</table></div></div>`;
+  } else tbl = '<div class="card"><p class="note">Add 8 or more values to unlock the backtest.</p></div>';
+  out.innerHTML = `<div class="stats">
+    <div class="stat"><b>${fmt(end)}</b><span>step ${n + H} central (${fc.name})</span></div>
+    <div class="stat"><b>${fmt(r.lo[H - 1])} to ${fmt(r.hi[H - 1])}</b><span>${$('#tr-ci').selectedOptions[0].text} range at the end</span></div>
+    <div class="stat"><b>${per >= 0 ? '+' : ''}${fmt(per)}</b><span>average change per step</span></div></div>
+    <div class="card">${s}${cross}${note ? `<p class="note warn">${note}</p>` : ''}</div>${tbl}`;
+}
+on('#p-trend textarea, #p-trend input, #p-trend select', 'input change', renderTrend);
+
+/* ---------- 2. MONTE CARLO ---------- */
+const mcRows = [
+  { name: 'customers', min: 800, mode: 1200, max: 2000 },
+  { name: 'price', min: 19, mode: 29, max: 49 },
+  { name: 'churn', min: 0.03, mode: 0.06, max: 0.14 }
+];
+function drawMcRows() {
+  $('#mc-vars').innerHTML = mcRows.map((r, i) => `<div class="var-row">
+    <input aria-label="Name" data-i="${i}" data-k="name" value="${esc(r.name)}" spellcheck="false">
+    <input aria-label="Low" data-i="${i}" data-k="min" type="number" step="any" value="${r.min}">
+    <input aria-label="Likely" data-i="${i}" data-k="mode" type="number" step="any" value="${r.mode}">
+    <input aria-label="High" data-i="${i}" data-k="max" type="number" step="any" value="${r.max}">
+    <button class="btn ghost small" type="button" data-del="${i}" aria-label="Remove input">×</button></div>`).join('');
+  $$('#mc-vars input').forEach(el => el.addEventListener('input', () => { mcRows[+el.dataset.i][el.dataset.k] = el.value; }));
+  $$('#mc-vars [data-del]').forEach(b => b.addEventListener('click', () => { mcRows.splice(+b.dataset.del, 1); drawMcRows(); }));
+}
+function runMC() {
+  const out = $('#mc-out');
+  const r = F.simulate({ inputs: mcRows, formula: $('#mc-f').value, trials: +$('#mc-n').value, threshold: $('#mc-th').value });
+  if (r.error) { out.innerHTML = `<div class="card"><p class="warn">${esc(r.error)}</p></div>`; return; }
+  const { lo, hi, bins } = r.hist, th = r.threshold, pAbove = r.pAbove, pr = r.sens;
+  const W = 720, Ht = 260, m = { l: 14, r: 14, t: 18, b: 28 }, B = bins.length, span = hi - lo || 1;
+  const bm = Math.max(...bins), X = v => m.l + (v - lo) / span * (W - m.l - m.r), bw = (W - m.l - m.r) / B;
+  let s = `<svg class="chart" viewBox="0 0 ${W} ${Ht}" role="img" aria-label="Distribution of simulated outcomes">`;
+  bins.forEach((c, i) => { const h = c / bm * (Ht - m.t - m.b); s += `<rect class="bar" x="${m.l + i * bw + 1}" y="${Ht - m.b - h}" width="${Math.max(1, bw - 2)}" height="${h}" opacity="${.35 + .65 * c / bm}"/>`; });
+  [[r.p10, 'P10'], [r.p50, 'P50'], [r.p90, 'P90']].forEach(([v, l]) => { const x = X(v); s += `<line class="mk" x1="${x}" x2="${x}" y1="${m.t}" y2="${Ht - m.b}"/><text class="tag" x="${x}" y="${m.t - 5}" text-anchor="middle">${l}</text>`; });
+  if (th !== null && th >= lo && th <= hi) s += `<line class="amber" x1="${X(th)}" x2="${X(th)}" y1="${m.t}" y2="${Ht - m.b}"/>`;
+  ticks(lo, hi, 5).forEach(t => { s += `<text class="ax" x="${X(t)}" y="${Ht - 8}" text-anchor="middle">${fmt(t)}</text>`; });
+  s += '</svg>';
+  out.innerHTML = `<div class="stats">
+    <div class="stat"><b>${fmt(r.p50)}</b><span>median</span></div>
+    <div class="stat"><b>${fmt(r.p10)} to ${fmt(r.p90)}</b><span>80% of outcomes</span></div>
+    <div class="stat"><b>${fmt(r.mean)}</b><span>mean</span></div>
+    ${pAbove === null ? '' : `<div class="stat"><b>${pct(pAbove)}</b><span>chance above ${fmt(th)}</span></div>`}</div>
+    <div class="card">${s}<p class="note">${r.trials.toLocaleString()} trials. 5th to 95th percentile: ${fmt(r.p5)} to ${fmt(r.p95)}.</p></div>
+    <div class="card"><h2>What moves the answer</h2><p class="note">Correlation between each input and the result. Bigger bars deserve better estimates.</p>
+    ${pr.map(p => `<div style="display:grid;grid-template-columns:minmax(0,110px) 1fr 54px;gap:10px;align-items:center;margin-top:8px"><span style="font:13px var(--font-m);overflow-wrap:anywhere">${esc(p.name)}</span><div class="meter"><i class="${p.r < 0 ? 'neg' : ''}" style="width:${Math.abs(p.r) * 100}%"></i></div><span style="font:12px var(--font-m)">${p.r >= 0 ? '+' : ''}${p.r.toFixed(2)}</span></div>`).join('')}</div>`;
+}
+drawMcRows();
+$('#mc-add').addEventListener('click', () => { mcRows.push({ name: 'x' + (mcRows.length + 1), min: 0, mode: 1, max: 2 }); drawMcRows(); });
+$('#mc-run').addEventListener('click', runMC);
+runMC();
+
+/* ---------- 3. BAYES ---------- */
+const byRows = [
+  { label: 'Positive screening test', ph: 90, pn: 5, seen: '1' },
+  { label: 'Second independent test', ph: 80, pn: 10, seen: '1' }
+];
+function drawByRows() {
+  $('#by-rows').innerHTML = byRows.map((r, i) => `<div class="opt">
+    <input aria-label="Evidence label" data-i="${i}" data-k="label" value="${esc(r.label)}">
+    <div class="row" style="margin-top:6px">
+      <div><label for="by-h${i}">If true (%)</label><input id="by-h${i}" data-i="${i}" data-k="ph" type="number" min="0" max="100" step="any" value="${r.ph}"></div>
+      <div><label for="by-n${i}">If false (%)</label><input id="by-n${i}" data-i="${i}" data-k="pn" type="number" min="0" max="100" step="any" value="${r.pn}"></div>
+      <div><label for="by-s${i}">Observed</label><select id="by-s${i}" data-i="${i}" data-k="seen"><option value="1" ${r.seen === '1' ? 'selected' : ''}>seen</option><option value="0" ${r.seen === '0' ? 'selected' : ''}>not seen</option></select></div>
+    </div><p style="margin:8px 0 0"><button class="btn ghost small" type="button" data-del="${i}">Remove</button></p></div>`).join('');
+  $$('#by-rows [data-k]').forEach(el => ['input', 'change'].forEach(e => el.addEventListener(e, () => { byRows[+el.dataset.i][el.dataset.k] = el.value; renderBayes(); })));
+  $$('#by-rows [data-del]').forEach(b => b.addEventListener('click', () => { byRows.splice(+b.dataset.del, 1); drawByRows(); renderBayes(); }));
+}
+function renderBayes() {
+  const steps = F.bayes($('#by-prior').value, byRows), p = steps[steps.length - 1].post;
+  $('#by-out').innerHTML = `<div class="stats">
+    <div class="stat"><b>${pct(steps[0].post)}</b><span>before evidence</span></div>
+    <div class="stat"><b>${pct(p)}</b><span>after ${byRows.length} piece${byRows.length === 1 ? '' : 's'} of evidence</span></div>
+    <div class="stat"><b>${(p / (1 - p) / (steps[0].post / (1 - steps[0].post))).toFixed(1)}×</b><span>combined odds shift</span></div></div>
+    <div class="card"><div class="scroll"><table><tr><th>Step</th><th>Likelihood ratio</th><th>Probability</th><th></th></tr>
+    ${steps.map(s => `<tr><td>${esc(s.label)}</td><td>${s.lr === null ? '' : s.lr.toFixed(2)}</td><td>${pct(s.post)}</td><td style="width:40%"><div class="meter"><i style="width:${s.post * 100}%"></i></div></td></tr>`).join('')}</table></div>
+    <p class="note">A ratio above 1 pushes toward true, below 1 toward false. Evidence is treated as independent. Correlated evidence counts for less than this shows.</p></div>`;
+}
+drawByRows();
+$('#by-add').addEventListener('click', () => { byRows.push({ label: 'New evidence', ph: 60, pn: 30, seen: '1' }); drawByRows(); renderBayes(); });
+on('#by-prior', 'input', renderBayes);
+renderBayes();
+
+/* ---------- 4. DECISION ---------- */
+const dcOpts = [
+  { name: 'Launch now', text: '30, 120000\n50, 40000\n20, -60000' },
+  { name: 'Wait a quarter', text: '40, 90000\n45, 35000\n15, -10000' },
+  { name: 'Do not launch', text: '100, 0' }
+];
+function drawDcOpts() {
+  $('#dc-opts').innerHTML = dcOpts.map((o, i) => `<div class="opt">
+    <input aria-label="Option name" data-i="${i}" data-k="name" value="${esc(o.name)}">
+    <label for="dc-t${i}">Outcomes: chance %, payoff</label>
+    <textarea id="dc-t${i}" data-i="${i}" data-k="text" style="min-height:76px">${esc(o.text)}</textarea>
+    <p style="margin:8px 0 0"><button class="btn ghost small" type="button" data-del="${i}">Remove</button></p></div>`).join('');
+  $$('#dc-opts [data-k]').forEach(el => el.addEventListener('input', () => { dcOpts[+el.dataset.i][el.dataset.k] = el.value; renderDc(); }));
+  $$('#dc-opts [data-del]').forEach(b => b.addEventListener('click', () => { dcOpts.splice(+b.dataset.del, 1); drawDcOpts(); renderDc(); }));
+}
+function renderDc() {
+  const lam = +$('#dc-risk').value; $('#dc-risk-v').textContent = lam.toFixed(1);
+  const good = F.decide(dcOpts.map(o => ({ name: o.name, outcomes: o.text.split('\n').map(l => nums(l)).filter(a => a.length >= 2).map(a => ({ p: a[0], v: a[1] })) })), lam);
+  const maxAbs = Math.max(1e-9, ...good.map(r => Math.abs(r.score)));
+  $('#dc-out').innerHTML = good.length ? `<div class="stats"><div class="stat"><b>${esc(good[0].name)}</b><span>highest risk-adjusted score</span></div>
+    <div class="stat"><b>${fmt(good[0].ev)}</b><span>its expected payoff</span></div></div>
+    <div class="card"><div class="scroll"><table><tr><th>Option</th><th>Expected</th><th>Spread</th><th>Worst</th><th>Best</th><th>Score</th><th></th></tr>
+    ${good.map(r => `<tr><td>${esc(r.name)}${r.rescaled ? ' <span class="warn" title="Chances were rescaled to 100">*</span>' : ''}</td><td>${fmt(r.ev)}</td><td>${fmt(r.sd)}</td><td>${fmt(r.worst)}</td><td>${fmt(r.best)}</td><td>${fmt(r.score)}</td><td style="width:22%"><div class="meter"><i class="${r.score < 0 ? 'neg' : ''}" style="width:${Math.abs(r.score) / maxAbs * 100}%"></i></div></td></tr>`).join('')}</table></div>
+    <p class="note">${good.some(r => r.rescaled) ? '* Chances did not add to 100 and were rescaled. ' : ''}Raise risk aversion to favour steadier options. Set it to 0 to rank by expected payoff alone.</p></div>`
+    : '<div class="card"><p class="warn">Add outcome lines like "40, 5000" to compare options.</p></div>';
+}
+drawDcOpts();
+$('#dc-add').addEventListener('click', () => { dcOpts.push({ name: 'New option', text: '50, 1000\n50, -500' }); drawDcOpts(); renderDc(); });
+on('#dc-risk', 'input', renderDc);
+renderDc();
+
+/* ---------- 5. GROWTH ---------- */
+function renderGrowth() {
+  const s0 = +$('#gr-s').value, r = (+$('#gr-r').value) / 100, P = Math.max(1, Math.min(500, Math.round(+$('#gr-p').value) || 1)), add = +$('#gr-a').value || 0;
+  const tg = $('#gr-t').value === '' ? null : +$('#gr-t').value;
+  const g = F.growth({ start: s0, rate: +$('#gr-r').value, periods: P, add, target: tg });
+  const pts = g.points.map((y, x) => ({ x, y })), end = g.end, contrib = g.contributed;
+  const log = $('#gr-log').value === 'log' && pts.every(p => p.y > 0);
+  const reach = g.reach === null ? '–' : g.reach === 'never' ? 'never' : g.reach + ' periods';
+  $('#gr-out').innerHTML = `<div class="stats">
+    <div class="stat"><b>${fmt(end)}</b><span>after ${P} periods</span></div>
+    <div class="stat"><b>${fmt(end - contrib)}</b><span>of it is growth, ${fmt(contrib)} is put in</span></div>
+    <div class="stat"><b>${g.doubling === null ? '–' : g.doubling.toFixed(1)}</b><span>periods to double (no additions)</span></div>
+    <div class="stat"><b>${reach}</b><span>to reach ${tg === null ? 'target' : fmt(tg)}</span></div></div>
+    <div class="card">${lineChart(pts, { log })}<p class="note">${$('#gr-log').value === 'log' && !log ? 'Log scale needs positive values, so the linear scale is shown.' : 'Starts at ' + fmt(s0) + ' and compounds at ' + (r * 100).toFixed(2) + '% per period.'}</p></div>`;
+  const b = +$('#cg-b').value, e = +$('#cg-e').value, n = +$('#cg-n').value;
+  const cg = F.cagr(b, e, n);
+  $('#cg-out').innerHTML = cg !== null ? `Compound rate: <b>${(cg * 100).toFixed(2)}%</b> per period. Total change ${((e / b - 1) * 100).toFixed(0)}%.` : 'Enter positive values for all three.';
+}
+on('#p-growth input, #p-growth select', 'input change', renderGrowth);
+renderGrowth();
+
+/* ---------- 6. LEDGER ---------- */
+const KEY = 'foresight-ledger-v1';
+let ledger = [];
+try { ledger = JSON.parse(localStorage.getItem(KEY) || '[]'); if (!Array.isArray(ledger)) ledger = []; } catch (e) { ledger = []; }
+const saveLedger = () => { try { localStorage.setItem(KEY, JSON.stringify(ledger)); } catch (e) { } };
+function renderLedger() {
+  const sc = F.score(ledger), brier = sc.brier, buckets = sc.buckets, done = { length: sc.n };
+  const today = new Date().toISOString().slice(0, 10);
+  const S = 280, pad = 34, XY = v => pad + v * (S - pad - 12), YY = v => S - pad - v * (S - pad - 12);
+  let cal = `<svg class="chart" style="max-width:340px" viewBox="0 0 ${S} ${S}" role="img" aria-label="Calibration chart: predicted probability against how often it happened">`;
+  [0, .25, .5, .75, 1].forEach(t => { cal += `<line class="gl" x1="${XY(t)}" x2="${XY(t)}" y1="${YY(0)}" y2="${YY(1)}"/><line class="gl" x1="${XY(0)}" x2="${XY(1)}" y1="${YY(t)}" y2="${YY(t)}"/><text class="ax" x="${XY(t)}" y="${S - 14}" text-anchor="middle">${t * 100}</text><text class="ax" x="${pad - 6}" y="${YY(t) + 4}" text-anchor="end">${t * 100}</text>`; });
+  cal += `<line class="mk" x1="${XY(0)}" y1="${YY(0)}" x2="${XY(1)}" y2="${YY(1)}"/>`;
+  buckets.filter(b => b.n).forEach(b => { cal += `<circle class="dot" cx="${XY(b.p / b.n)}" cy="${YY(b.o / b.n)}" r="${Math.min(14, 4 + Math.sqrt(b.n) * 2)}" opacity=".85"/>`; });
+  cal += '</svg>';
+  const list = ledger.slice().reverse().map(x => {
+    const open = x.outcome === null || x.outcome === undefined, late = open && x.due && x.due < today;
+    return `<div class="pred"><div><b>${esc(x.text)}</b><small>${Math.round(x.p * 100)}% · ${open ? (x.due ? (late ? '<span class="warn">due ' + esc(x.due) + '</span>' : 'known by ' + esc(x.due)) : 'open') : (x.outcome ? '<span class="good">happened</span>' : '<span class="bad">did not happen</span>')}</small></div>
+      <div class="acts">${open ? `<button class="btn small" data-res="1" data-id="${x.id}" type="button">Yes</button><button class="btn ghost small" data-res="0" data-id="${x.id}" type="button">No</button>` : `<button class="btn ghost small" data-res="x" data-id="${x.id}" type="button">Reopen</button>`}<button class="btn ghost small" data-res="d" data-id="${x.id}" type="button" aria-label="Delete prediction">×</button></div></div>`;
+  }).join('');
+  $('#lg-out').innerHTML = `<div class="stats">
+    <div class="stat"><b>${ledger.length}</b><span>logged, ${done.length} resolved</span></div>
+    <div class="stat"><b>${brier === null ? '–' : brier.toFixed(3)}</b><span>Brier score (0 is perfect, 0.25 is always saying 50%)</span></div>
+    <div class="stat"><b>${sc.hitRate === null ? '–' : pct(sc.hitRate, 0)}</b><span>happened</span></div></div>
+    <div class="card"><h2>Calibration</h2>${done.length >= 3 ? cal + '<p class="note">Dots on the diagonal mean your stated odds matched reality. Dots below it mean you were overconfident. Dot size shows how many predictions fall in that band.</p>' : '<p class="note">Resolve a few predictions to see how your stated odds compare with what happened.</p>'}</div>
+    <div class="card"><h2>Predictions</h2>${list || '<p class="note">Nothing logged yet. Add a claim, a probability, and a date you expect to know the answer.</p>'}</div>`;
+  $$('#lg-out [data-res]').forEach(b => b.addEventListener('click', () => {
+    const i = ledger.findIndex(x => String(x.id) === b.dataset.id); if (i < 0) return;
+    const a = b.dataset.res;
+    if (a === 'd') ledger.splice(i, 1); else ledger[i].outcome = a === '1' ? true : a === '0' ? false : null;
+    saveLedger(); renderLedger();
+  }));
+}
+$('#lg-add').addEventListener('click', () => {
+  const text = $('#lg-t').value.trim(), p = Math.min(99, Math.max(1, +$('#lg-p').value || 50)) / 100;
+  if (!text) { $('#lg-t').focus(); return; }
+  ledger.push({ id: Date.now() + Math.random(), text, p, due: $('#lg-d').value, outcome: null });
+  $('#lg-t').value = ''; saveLedger(); renderLedger();
+});
+$('#lg-copy').addEventListener('click', async () => {
+  const txt = JSON.stringify(ledger), msg = $('#lg-copy-msg');
+  try { await navigator.clipboard.writeText(txt); msg.textContent = 'Copied.'; }
+  catch (e) { $('#lg-restore').value = txt; $('#lg-restore').select(); msg.textContent = 'Copy blocked here. The text is in the box below, select and copy it.'; }
+});
+$('#lg-load').addEventListener('click', () => {
+  const msg = $('#lg-load-msg');
+  try {
+    const d = JSON.parse($('#lg-restore').value);
+    if (!Array.isArray(d)) throw new Error('not a list');
+    ledger = d.filter(x => x && typeof x.text === 'string' && typeof x.p === 'number').map(x => ({ id: x.id || Date.now() + Math.random(), text: x.text, p: Math.min(.99, Math.max(.01, x.p)), due: x.due || '', outcome: x.outcome === true || x.outcome === false ? x.outcome : null }));
+    saveLedger(); renderLedger(); msg.textContent = 'Restored ' + ledger.length + ' predictions.';
+  } catch (e) { msg.textContent = 'That is not a valid backup.'; }
+});
+renderLedger();
+
+renderTrend();
+</script>
+</body>
+</html>

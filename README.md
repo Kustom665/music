@@ -1,19 +1,30 @@
 # music
 
-A landing page for **Wavelength**, a music review site. Static HTML/CSS/JS — no build step required.
+Two small static projects, no dependencies, no build step needed to run either.
 
-## Structure
+## Wavelength (`index.html`, `css/`, `js/`)
 
-- `index.html` — landing page markup (hero, featured review, review grid with genre filtering, genres, about, newsletter signup)
-- `css/styles.css` — styling
-- `js/script.js` — mobile nav toggle, genre filter, newsletter form handling
+Landing page for a music review site: hero, featured review, genre-filtered grid, about, newsletter form.
+Open `index.html`, or `python3 -m http.server 8000`.
 
-## Run locally
+## Foresight Kit (`foresight/`)
 
-Open `index.html` directly in a browser, or serve the directory:
+Forecasting instruments: trend projection with backtest, Monte Carlo, Bayesian updating, decision comparison, growth maths and a prediction ledger.
+
+| File | Role |
+| --- | --- |
+| `engine.js` | Headless maths. Runs in Node and the browser, no DOM, no network. User formulas go through a small parser, never `eval`. |
+| `cli.js` | JSON-in, JSON-out command line over the engine. |
+| `index.html` | The interface. Open it directly. |
+| `test.js` | Engine tests. |
+| `build.js` | Bundles page and engine into `dist/foresight.html`, one file. |
 
 ```
-python3 -m http.server 8000
+npm test
+npm run build
+node foresight/cli.js trend "120,128,131,145,152,149,166,171" --h 6 --target 220
+node foresight/cli.js sim --formula "units*price" --var "units=100,150,300" --var "price=9,12,15" --seed 1
+node foresight/cli.js help
 ```
 
-Then visit `http://localhost:8000`.
+The tools extend the numbers you give them. They do not know the future.
