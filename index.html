@@ -3,26 +3,33 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Wavelength — Honest Music Reviews</title>
+<title>Wavelength Music Reviews</title>
 <meta name="description" content="Wavelength: sharp, honest reviews of new albums, EPs, and singles across every genre.">
+<meta property="og:title" content="Wavelength Music Reviews">
+<meta property="og:description" content="Sharp, honest reviews of new albums, EPs, and singles across every genre.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0b0b0f">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230b0b0f'/%3E%3Cpath d='M3 17c3 0 3-9 6-9s3 16 6 16 3-12 6-12 3 7 8 7' fill='none' stroke='%23ff5c39' stroke-width='2.6' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
 
+<a class="skip-link" href="#reviews">Skip to reviews</a>
+
 <div class="noise"></div>
 
-<header class="site-header">
+<header class="site-header" id="top">
   <div class="container header-inner">
-    <a href="#" class="logo">Wave<span>length</span></a>
-    <nav class="main-nav">
+    <a href="#top" class="logo">Wave<span>length</span></a>
+    <nav class="main-nav" id="main-nav" aria-label="Main">
       <a href="#reviews">Reviews</a>
       <a href="#genres">Genres</a>
       <a href="#about">About</a>
       <a href="#newsletter" class="nav-cta">Subscribe</a>
     </nav>
-    <button class="nav-toggle" aria-label="Toggle menu">
+    <button class="nav-toggle" aria-label="Menu" aria-expanded="false" aria-controls="main-nav">
       <span></span><span></span><span></span>
     </button>
   </div>
@@ -59,7 +66,12 @@
         <h2>Midnight Static — <em>Lower Frequencies</em></h2>
         <div class="score score-lg">9.1</div>
         <p>A record that sounds like it was mixed at 3am and meant to be heard that way. "Lower Frequencies" trades the band's earlier pop instincts for something murkier, slower, and far more interesting — proof that restraint can hit harder than a chorus.</p>
-        <a href="#" class="read-link">Read the full review →</a>
+        <button class="read-link" id="full-toggle" type="button" aria-expanded="false" aria-controls="full-review">Read the full review →</button>
+        <div class="full-review" id="full-review" hidden>
+          <p>The opening run of "Static Hymn" and "Basement Weather" sets the terms: drums mixed back, guitars smeared into the room, vocals close enough to catch the breath between lines. Nothing here chases a single. The nearest thing to one, "Porch Light, Off", is the quietest song on the record and the best.</p>
+          <p>It sags once. The eight-minute "Interference" circles a good idea for about two minutes too long. But the closing pair recovers everything, and the last forty seconds of "Lower Frequencies (Reprise)" are the most affecting thing the band has recorded.</p>
+          <p><strong>Verdict:</strong> a confident turn toward the dark that rewards headphones, a late night, and patience.</p>
+        </div>
       </div>
     </div>
   </section>
@@ -70,11 +82,15 @@
       <div class="section-head">
         <h2>Latest reviews</h2>
         <div class="filters">
-          <button class="filter active" data-filter="all">All</button>
-          <button class="filter" data-filter="indie">Indie</button>
-          <button class="filter" data-filter="electronic">Electronic</button>
-          <button class="filter" data-filter="hiphop">Hip-Hop</button>
-          <button class="filter" data-filter="rock">Rock</button>
+          <button class="filter active" data-filter="all" aria-pressed="true">All</button>
+          <button class="filter" data-filter="indie" aria-pressed="false">Indie</button>
+          <button class="filter" data-filter="electronic" aria-pressed="false">Electronic</button>
+          <button class="filter" data-filter="hiphop" aria-pressed="false">Hip-Hop</button>
+          <button class="filter" data-filter="rock" aria-pressed="false">Rock</button>
+          <button class="filter" data-filter="pop" aria-pressed="false">Pop</button>
+          <button class="filter" data-filter="rnb" aria-pressed="false">R&amp;B</button>
+          <button class="filter" data-filter="jazz" aria-pressed="false">Jazz</button>
+          <button class="filter" data-filter="metal" aria-pressed="false">Metal</button>
         </div>
       </div>
 
@@ -158,10 +174,65 @@
           </div>
         </article>
 
+        <article class="review-card" data-genre="pop" data-extra="true">
+          <div class="card-art art-8"></div>
+          <div class="card-body">
+            <div class="card-top">
+              <span class="genre-pill">Pop</span>
+              <span class="score">8.0</span>
+            </div>
+            <h3>Marlowe Quinn — <em>Neon Parade</em></h3>
+            <p>Bright hooks with a bruise underneath. The glossy production hides a much sadder record.</p>
+            <span class="byline">Reviewed by Dana Okafor · 4 min read</span>
+          </div>
+        </article>
+
+        <article class="review-card" data-genre="rnb" data-extra="true">
+          <div class="card-art art-9"></div>
+          <div class="card-body">
+            <div class="card-top">
+              <span class="genre-pill">R&amp;B</span>
+              <span class="score">8.7</span>
+            </div>
+            <h3>Sade Imani — <em>Slow Light</em></h3>
+            <p>Patient, late-night R&amp;B where every pause is doing real work.</p>
+            <span class="byline">Reviewed by Priya Nathan · 5 min read</span>
+          </div>
+        </article>
+
+        <article class="review-card" data-genre="jazz" data-extra="true">
+          <div class="card-art art-10"></div>
+          <div class="card-body">
+            <div class="card-top">
+              <span class="genre-pill">Jazz</span>
+              <span class="score">9.0</span>
+            </div>
+            <h3>The Hollis Quartet — <em>Room Tone</em></h3>
+            <p>Recorded live in one afternoon, and you can hear the room breathe between solos.</p>
+            <span class="byline">Reviewed by Marcus Reid · 6 min read</span>
+          </div>
+        </article>
+
+        <article class="review-card" data-genre="metal" data-extra="true">
+          <div class="card-art art-11"></div>
+          <div class="card-body">
+            <div class="card-top">
+              <span class="genre-pill">Metal</span>
+              <span class="score">7.4</span>
+            </div>
+            <h3>Black Orchard — <em>Salt and Iron</em></h3>
+            <p>Crushing, catchy, and a little too long, but the riffs earn the runtime.</p>
+            <span class="byline">Reviewed by Priya Nathan · 4 min read</span>
+          </div>
+        </article>
+
       </div>
 
+      <p class="empty" id="reviews-empty" hidden>No reviews in this genre yet.</p>
+      <p class="sr-only" id="reviews-count" aria-live="polite"></p>
+
       <div class="load-more-wrap">
-        <button class="btn btn-outline">Load more reviews</button>
+        <button class="btn btn-outline" id="load-more" type="button">Load more reviews</button>
       </div>
     </div>
   </section>
@@ -171,14 +242,14 @@
     <div class="container">
       <h2>Browse by genre</h2>
       <div class="genre-grid">
-        <a href="#" class="genre-card">Indie</a>
-        <a href="#" class="genre-card">Electronic</a>
-        <a href="#" class="genre-card">Hip-Hop</a>
-        <a href="#" class="genre-card">Rock</a>
-        <a href="#" class="genre-card">Pop</a>
-        <a href="#" class="genre-card">R&amp;B</a>
-        <a href="#" class="genre-card">Jazz</a>
-        <a href="#" class="genre-card">Metal</a>
+        <a href="#reviews" class="genre-card" data-genre="indie">Indie</a>
+        <a href="#reviews" class="genre-card" data-genre="electronic">Electronic</a>
+        <a href="#reviews" class="genre-card" data-genre="hiphop">Hip-Hop</a>
+        <a href="#reviews" class="genre-card" data-genre="rock">Rock</a>
+        <a href="#reviews" class="genre-card" data-genre="pop">Pop</a>
+        <a href="#reviews" class="genre-card" data-genre="rnb">R&amp;B</a>
+        <a href="#reviews" class="genre-card" data-genre="jazz">Jazz</a>
+        <a href="#reviews" class="genre-card" data-genre="metal">Metal</a>
       </div>
     </div>
   </section>
@@ -213,14 +284,14 @@
         <input type="email" placeholder="you@example.com" required aria-label="Email address">
         <button type="submit" class="btn btn-primary">Subscribe</button>
       </form>
-      <p class="form-note" id="form-note"></p>
+      <p class="form-note" id="form-note" role="status" aria-live="polite"></p>
     </div>
   </section>
 </main>
 
 <footer class="site-footer">
   <div class="container footer-inner">
-    <a href="#" class="logo">Wave<span>length</span></a>
+    <a href="#top" class="logo">Wave<span>length</span></a>
     <nav class="footer-nav">
       <a href="#reviews">Reviews</a>
       <a href="#genres">Genres</a>
