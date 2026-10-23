@@ -1,0 +1,11 @@
+{
+  "name": "music",
+  "private": true,
+  "description": "Wavelength landing page and the Foresight forecasting kit",
+  "scripts": {
+    "test": "node --test foresight/test.js",
+    "bundle": "node foresight/build.js",
+    "foresight": "node foresight/cli.js"
+  },
+  "engines": { "node": ">=18" }
+}
